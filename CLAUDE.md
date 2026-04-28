@@ -37,7 +37,7 @@ Significant technical decisions are recorded as ADRs in `docs/adr/`. Read these 
    - Run `pnpm -w format` to ensure consistent code formatting.
 6. Documentation Phase:
    - Ensure README.md is accurate re: architecture/features
-   - Ensure accurate subdirectory AGENTS.md files, esp. directory structures
+   - Ensure accurate subdirectory CLAUDE.md files, esp. directory structures
    - Remove outdated/redundant information
    - **When adding new tools/libraries**: Update README.md Common Stack section
    - **When adding new workspace commands**: Update README.md Development Commands section
@@ -109,9 +109,3 @@ This monorepo uses **Vitest 4.0+** with workspace/projects configuration for tes
 - Export interfaces alongside components
 - Comprehensive JSDoc documentation for all TypeScript files
 - NEVER hardcode string literals - use centralized constants e.g. `src/lib/constants.ts`
-  - e.g. `DISCORD.*` for Discord constants
-  - e.g. `CONFIG.DEFAULT.*` for config defaults
-
-## Available Libraries
-
-- Depends on which package you are working on.
