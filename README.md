@@ -6,7 +6,7 @@ An opinionated monorepo starter for TypeScript projects — easy to fork, easy t
 **Frontend:** Next.js · React · SCSS Modules
 
 <div align="center">
-	<img src="docs/images/monorepo-starter.png" alt="Monorepo Starter" width="61.8%">
+	<img src="docs/images/monorepo-starter.png" alt="Monorepo Starter" width="91.2%">
 </div>
 
 > [!TIP]
