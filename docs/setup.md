@@ -53,7 +53,7 @@ You'll get a new repo with all the files and a clean git history — no fork rel
 Once your repo is created, clone it:
 
 ```bash
-git clone https://github.com/your-org/your-repo-name.git
+git clone https://github.com/your-username/your-repo-name.git
 cd your-repo-name
 ```
 

@@ -1,11 +1,170 @@
-.hello {
+.page {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	padding: 4rem 2rem;
+	font-family: var(--font-geist-sans);
+}
+
+.content {
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	// align-items: center;
-	margin: 0 10rem;
-	height: 100vh;
-	font-size: 3rem;
+	gap: 3.5rem;
+	max-width: 680px;
+	width: 100%;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.header {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.eyebrow {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #888;
+}
+
+.title {
+	font-size: clamp(2.5rem, 6vw, 4rem);
+	font-weight: 700;
+	letter-spacing: -0.03em;
+	line-height: 1;
+	color: var(--foreground);
+	font-family: var(--font-geist-mono);
+}
+
+.tagline {
+	font-size: 1.125rem;
+	line-height: 1.6;
+	color: #555;
+	max-width: 520px;
+
+	strong {
+		color: var(--foreground);
+		font-weight: 600;
+	}
+}
+
+// ── Features ──────────────────────────────────────────────────────────────────
+
+.features {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	list-style: none;
+	border: 1px solid #e8e8e8;
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.feature {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	padding: 1.25rem 1.5rem;
+
+	& + & {
+		border-top: 1px solid #e8e8e8;
+	}
+}
+
+.featureTitle {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.9375rem;
+	font-weight: 600;
+	color: var(--foreground);
+}
+
+.featureEmoji {
+	font-size: 1.1rem;
+	line-height: 1;
+}
+
+.featureDescription {
+	font-size: 0.875rem;
+	line-height: 1.6;
+	color: #666;
+}
+
+// ── Stack ─────────────────────────────────────────────────────────────────────
+
+.stackRow {
+	display: flex;
+	align-items: baseline;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.stackLabel {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #aaa;
+	white-space: nowrap;
+}
+
+.stack {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	list-style: none;
+}
+
+.badge {
+	padding: 0.25rem 0.65rem;
+	border-radius: 999px;
+	border: 1px solid #e0e0e0;
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: #555;
+	background: #fafafa;
+	font-family: var(--font-geist-mono);
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+
+.actions {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+%button-base {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.625rem 1.25rem;
+	border-radius: 8px;
+	font-size: 0.9375rem;
+	font-weight: 500;
 	font-family: var(--font-geist-sans);
-	color: black;
+	transition: opacity 0.15s ease;
+	cursor: pointer;
+
+	&:hover {
+		opacity: 0.8;
+	}
+}
+
+.buttonPrimary {
+	@extend %button-base;
+	background: var(--foreground);
+	color: var(--background);
+}
+
+.buttonSecondary {
+	@extend %button-base;
+	background: transparent;
+	color: var(--foreground);
+	padding-left: 0;
 }
