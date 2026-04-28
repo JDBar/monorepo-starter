@@ -1,0 +1,27 @@
+{
+	"name": "{{packageName}}",
+	"version": "0.0.1",
+	"description": "{{packageDescription}}",
+	"type": "module",
+	"exports": {
+		".": "./dist/index.js"
+	},
+	"bin": {
+		"{{cliCommandName}}": "./dist/cli.js"
+	},
+	"scripts": {
+		"build": "pkgroll",
+		"check": "pnpm run \"/^check:.*/\"",
+		"check:lint": "eslint . --max-warnings 0",
+		"check:types": "tsc --noEmit"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@repo/eslint-config": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"@types/node": "^24.1.0",
+		"eslint": "^9.28.0",
+		"pkgroll": "^2.0.0",
+		"typescript": "5.9.2"
+	}
+}

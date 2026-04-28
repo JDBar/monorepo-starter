@@ -1,0 +1,81 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+	"name": "monorepo-starter",
+	"image": "mcr.microsoft.com/devcontainers/base:jammy",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {
+			"version": "24"
+		},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+
+	"initializeCommand": "bash ./.devcontainer/initialize.bash",
+	"postCreateCommand": "bash ./.devcontainer/postCreate.bash",
+	"postStartCommand": "bash ./.devcontainer/postStart.bash",
+
+	// Load environment variables from .env file at repo root.
+	// --hostname sets a stable container name so the SSH known_hosts entry never changes.
+	"runArgs": [
+		"--env-file",
+		"${localWorkspaceFolder}/.env",
+		"--memory",
+		"8g",
+		"--publish",
+		"127.0.0.1:2222:22",
+		"--hostname",
+		"monorepo-starter"
+	],
+
+	"mounts": [
+		// Persistent SSH host keys — survives container rebuilds so the host key
+		// fingerprint never changes and Windows known_hosts stays valid.
+		// Object form is fine here: only type/source/target are needed.
+		{
+			"source": "monorepo-starter-ssh-host-keys",
+			"target": "/etc/ssh-host-keys",
+			"type": "volume"
+		},
+		// Persistent Claude Code user data — survives container rebuilds so conversation
+		// history, global settings, and auth are not lost.
+		{
+			"source": "monorepo-starter-claude-home",
+			"target": "/home/vscode/.claude",
+			"type": "volume"
+		},
+		// Persistent global Claude Code settings — survives container rebuilds so the settings never change.
+		{
+			"source": "${localWorkspaceFolder}/.claude/etc/claude-code",
+			"target": "/etc/claude-code",
+			"type": "bind"
+		}
+	],
+
+	"containerEnv": {
+		// ignore system-level config Cursor/VS Code injects
+		"GIT_CONFIG_NOSYSTEM": "1",
+
+		// kill all prompts/UI
+		"GIT_TERMINAL_PROMPT": "0",
+		"GIT_ASKPASS": "/bin/false",
+		"GCM_INTERACTIVE": "Never",
+
+		// nuke SSH auth from the container
+		"SSH_AUTH_SOCK": "",
+		"GIT_SSH_COMMAND": "ssh -o BatchMode=yes -o IdentitiesOnly=yes -o IdentityFile=/dev/null",
+
+		// inject git config at env-precedence (beats /etc and ~/.gitconfig)
+		"GIT_CONFIG_COUNT": "5",
+		"GIT_CONFIG_KEY_0": "credential.helper",
+		"GIT_CONFIG_VALUE_0": "", // no helper
+		"GIT_CONFIG_KEY_1": "credential.interactive",
+		"GIT_CONFIG_VALUE_1": "never", // no interactive creds
+		"GIT_CONFIG_KEY_2": "url.disabled://.pushInsteadOf",
+		"GIT_CONFIG_VALUE_2": "https://", // kill HTTPS pushes
+		"GIT_CONFIG_KEY_3": "url.disabled://.pushInsteadOf",
+		"GIT_CONFIG_VALUE_3": "ssh://", // kill SSH pushes
+		"GIT_CONFIG_KEY_4": "url.disabled://.pushInsteadOf",
+		"GIT_CONFIG_VALUE_4": "git@" // kill git@ pushes
+	}
+}

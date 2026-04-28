@@ -1,0 +1,15 @@
+{
+	// Claude Code Desktop preview server configuration.
+	// Each app gets a unique port so both can run simultaneously.
+	// Docs: https://code.claude.com/docs/en/desktop#configure-preview-servers
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "test-app",
+			"runtimeExecutable": "pnpm",
+			"runtimeArgs": ["dev"],
+			"cwd": "apps/test-app",
+			"port": 3000
+		}
+	]
+}

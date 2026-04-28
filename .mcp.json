@@ -1,0 +1,10 @@
+{
+	"mcpServers": {
+		"playwright": {
+			"type": "stdio",
+			"command": "pnpx",
+			"args": ["@playwright/mcp@latest", "--config", "playwright.config.json"],
+			"env": {}
+		}
+	}
+}

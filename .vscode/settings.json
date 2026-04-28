@@ -1,0 +1,17 @@
+{
+	"eslint.workingDirectories": [
+		{
+			"mode": "auto"
+		}
+	],
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+	"jest.useJest30": true,
+	"jest.virtualFolders": [
+		// {
+		// 	"name": "web",
+		// 	"rootPath": "apps/web",
+		// 	"runMode": "on-demand"
+		// },
+	]
+}

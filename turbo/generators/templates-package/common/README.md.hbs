@@ -1,0 +1,32 @@
+# {{packageName}}
+
+{{#if packageDescription}}{{packageDescription}}{{else}}Shared package for the monorepo.{{/if}}
+
+## Development
+
+Run commands at the workspace root using `pnpm --filter {{packageName}} <command>` or from this directory with `pnpm <command>`.
+
+- `check:types` - Run TypeScript type checking
+- `check:lint` - Run ESLint linting
+- `check` - Run all checks
+- `format` - Format code with Prettier (run at workspace root: `pnpm format`)
+
+## Structure
+
+- `src/` - Source code
+- `src/lib/` - Library modules and utilities
+- `src/lib/constants.ts` - Centralized constants
+
+## Getting Started
+
+Install dependencies at the workspace root:
+
+```bash
+pnpm install
+```
+
+Run checks to verify setup:
+
+```bash
+pnpm -w check --filter {{packageName}}
+```

@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+/**
+ * {{packageName}} CLI entry point
+ * Bundled by pkgroll to dist/cli.js
+ */
+
+import * as Constants from "./lib/constants.js";
+
+/**
+ * Main CLI entry point
+ */
+async function main(): Promise<void> {
+	console.log(
+		`${Constants.CLI.NAME} v${Constants.CLI.VERSION}`
+	);
+	console.log(`${Constants.CLI.DESCRIPTION}`);
+
+	// TODO: Add your CLI logic here
+	// Example: Parse arguments, run commands, etc.
+}
+
+main().catch((error) => {
+	console.error("Error:", error);
+	process.exit(1);
+});

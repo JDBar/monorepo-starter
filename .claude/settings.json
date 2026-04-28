@@ -1,0 +1,32 @@
+{
+	"enableAllProjectMcpServers": true,
+	"plansDirectory": "/workspaces/monorepo-starter/.claude/plans",
+	"hooks": {
+		"Notification": [
+			{
+				"matcher": "",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "pnpm -w alert"
+					}
+				]
+			}
+		],
+		"Stop": [
+			{
+				"matcher": "",
+				"hooks": [
+					{
+						"type": "command",
+						"command": "pnpm -w format"
+					},
+					{
+						"type": "command",
+						"command": "pnpm -w alert"
+					}
+				]
+			}
+		]
+	}
+}

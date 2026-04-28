@@ -1,0 +1,80 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".vscode/**"
+      - ".claude/**"
+      - ".github/**"
+      - "**/README.md"
+      - "LICENSE"
+
+jobs:
+  quality-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 0 # Need full history for Turborepo affected detection
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        timeout-minutes: 5
+        with:
+          version: 10.12.1
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        timeout-minutes: 5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set Turborepo base for affected detection
+        run: |
+          echo "TURBO_SCM_BASE=${{ github.event.pull_request.base.sha }}" >> $GITHUB_ENV
+          echo "TURBO_SCM_HEAD=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+
+      - name: Cache Turborepo
+        uses: actions/cache@v4
+        with:
+          path: |
+            .turbo
+            **/node_modules/.cache/turbo
+            **/.turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Check formatting
+        run: pnpm check:format
+
+      - name: Lint affected packages
+        run: pnpm turbo check:lint --affected
+
+      - name: Type check affected packages
+        run: pnpm turbo check:types --affected
+
+      - name: Test affected packages
+        run: pnpm turbo test --affected
+
+      - name: Build affected packages
+        run: pnpm turbo build --affected
+
+      - name: Run integration tests for affected packages
+        run: pnpm turbo test:integration --affected
+
+      - name: Quality checks completed
+        run: echo "✅ All quality checks passed!"

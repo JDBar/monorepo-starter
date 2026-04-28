@@ -1,0 +1,11 @@
+.hello {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	// align-items: center;
+	margin: 0 10rem;
+	height: 100vh;
+	font-size: 3rem;
+	font-family: var(--font-geist-sans);
+	color: black;
+}
