@@ -5,6 +5,10 @@ An opinionated monorepo starter for TypeScript projects — easy to fork, easy t
 **Stack:** Node.js · TypeScript · PNPM Workspaces · Turborepo · Vitest  
 **Frontend:** Next.js · React · SCSS Modules
 
+<div align="center">
+	<img src="docs/images/monorepo-starter.png" alt="Monorepo Starter" width="61.8%">
+</div>
+
 > [!TIP]
 > **This is a GitHub template repository.** Click **Use this template → Create a new repository** at the top of this page to create your own repo pre-populated with all these files and a clean git history.
 
