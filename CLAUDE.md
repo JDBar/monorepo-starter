@@ -1,4 +1,4 @@
-# AGENTS.md / CLAUDE.md
+# CLAUDE.md
 
 **Project**: `monorepo-starter` - A Turborepo pnpm workspace of multiple projects.
 

@@ -139,9 +139,6 @@ dist
 # turborepo
 .turbo
 
-# symlinked CLAUDE.md
-CLAUDE.md
-
 # Other AI junk
 IMPLEMENTATION_PLAN.md
 FEEDBACK.md
