@@ -12,15 +12,20 @@ An opinionated monorepo starter for TypeScript projects — easy to fork, easy t
 
 ## 🚀 Quick start
 
+> [!NOTE]
+> The preferred way to run this project is inside a **devcontainer** — Docker handles Node, pnpm, and everything else, and it isolates AI agents from your git credentials. You can run it directly on your host machine too, but the devcontainer is strongly recommended if you're using Claude Code. See the [Setup Guide](docs/setup.md) to get started, or the [security model](docs/claude-code.md#-security-model) for the reasoning.
+
+**Running on your host machine?** You'll need:
+
+- [fnm](https://github.com/Schniz/fnm) — fast Node version manager (`fnm use` will pick up the version from `.nvmrc`)
+- [pnpm](https://pnpm.io/installation) — `npm install -g pnpm`
+
 ```bash
 pnpm install
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
-
-> [!NOTE]
-> The preferred way to run this project is inside a **devcontainer** — Docker handles Node, pnpm, and everything else, and it isolates AI agents from your git credentials. You can run it directly on your host machine too, but the devcontainer is strongly recommended if you're using Claude Code. See the [Setup Guide](docs/setup.md) to get started, or the [security model](docs/claude-code.md#-security-model) for the reasoning.
 
 ---
 
