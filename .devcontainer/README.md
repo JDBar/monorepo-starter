@@ -1,98 +1,89 @@
-# Dev Container
+# Devcontainer Internals
 
-This devcontainer is designed to be launched from **WSL2 Ubuntu** against the
-**Windows Docker Desktop** daemon. Launching from WSL2 (rather than directly from
-Windows) gives better filesystem performance for the workspace volume.
+This document explains how the devcontainer is built and why certain implementation decisions were made. It is intended for contributors and anyone modifying the container setup.
 
-## File Structure
+For **user-facing setup instructions**, see [docs/setup.md](../docs/setup.md).  
+For **Claude Code and SSH connection instructions**, see [docs/claude-code.md](../docs/claude-code.md).
+
+## Contents
+
+- [File structure](#file-structure)
+- [SSH server](#ssh-server)
+  - [Public key injection](#public-key-injection)
+  - [Persistent host keys](#persistent-host-keys)
+  - [sshd lifecycle](#sshd-lifecycle)
+- [Git lockdown](#git-lockdown)
+
+---
+
+## File structure
 
 ```
 .devcontainer/
 ├── devcontainer.json          # Container configuration
-├── initialize.bash            # Runs on the WSL2 host before the container starts
+├── initialize.bash            # Runs on the host before the container starts
 ├── postCreate.bash            # Runs once inside the container after creation
 ├── postCreate.ssh.bash        # Called by postCreate.bash — sets up the SSH server
 ├── postStart.bash             # Runs inside the container on every start
 └── .host_authorized_key.pub   # Gitignored — staged by initialize.bash at build time
 ```
 
-## SSH Access from Windows
+---
 
-The container exposes an SSH server on **`127.0.0.1:2222`** (Windows localhost only —
-not reachable from external networks). This lets you `ssh` into the container directly
-from Windows Git Bash or any Windows SSH client.
+## SSH server
 
-### First-time setup
+The container runs a full OpenSSH server on port 2222, exposed only on `127.0.0.1` (localhost — not reachable from external networks). It is configured with key-only auth, no passwords, and no root login.
 
-Add this stanza to `~/.ssh/config` on Windows (`C:\Users\<you>\.ssh\config`):
+### Public key injection
 
-```
-Host monorepo-starter
-    HostName 127.0.0.1
-    Port 2222
-    User vscode
-    IdentityFile ~/.ssh/id_ed25519
-    IdentitiesOnly yes
-    StrictHostKeyChecking no
-    UserKnownHostsFile /dev/null
-```
+Getting SSH public keys from the host machine into the container is non-trivial. Individual file bind mounts from a WSL2 home directory are unreliable with docker-in-docker — overlayfs layers shadow them silently. The workspace directory is always mounted reliably, so a staging approach is used instead:
 
-The key must be **passphrase-free** — tools like Claude Code Desktop cannot prompt for
-a passphrase. `StrictHostKeyChecking no` is safe here because you're connecting to
-localhost; there is no meaningful MITM risk on `127.0.0.1`.
+1. **`initialize.bash`** runs on the host (in WSL2, or directly on Mac/Linux) _before_ the container starts. It collects every `~/.ssh/*.pub` file and concatenates them into `.devcontainer/.host_authorized_key.pub` (gitignored).
+2. **`postCreate.ssh.bash`** runs inside the container after creation. It copies that staged file directly to `/home/vscode/.ssh/authorized_keys`.
 
-Then connect:
+This means all public keys present in `~/.ssh/` on the host are authorized automatically — no manual configuration needed.
 
-```bash
-ssh monorepo-starter
-```
+> [!NOTE]
+> `.host_authorized_key.pub` is regenerated fresh on every `initializeCommand` run, so adding a new key to `~/.ssh/` and rebuilding the container is all that's needed to authorize it.
 
-### How it works
+> [!WARNING]
+> **SSH agent keys are not included.** `initialize.bash` only reads `.pub` files from `~/.ssh/` — it does not query the SSH agent via `ssh-add -L`. If your key is loaded into an agent but has no corresponding `.pub` file on disk, it will not be authorized. The workaround is to ensure a `.pub` file exists alongside your private key, or to modify `initialize.bash` to also run `ssh-add -L >> "$OUT"`. Note that `ssh-add -L` is unreliable in WSL2, which is why the file-based approach is used here.
 
-**Public key injection** (`initialize.bash` → `postCreate.ssh.bash`)
+### Persistent host keys
 
-`initialize.bash` runs in WSL2 _before_ the container starts and collects every
-`~/.ssh/*.pub` file into `.devcontainer/.host_authorized_key.pub` (gitignored).
-`postCreate.ssh.bash` then copies that file directly to
-`/home/vscode/.ssh/authorized_keys` inside the container.
+The container's SSH host keys are stored in a named Docker volume (`monorepo-starter-ssh-host-keys`) mounted at `/etc/ssh-host-keys/`. Named volumes are tied to the Docker daemon rather than the container image, so they survive **Rebuild Container**.
 
-All public keys found in `~/.ssh/*.pub` are included automatically — if you have
-multiple keys they will all be authorized.
+This means the host key fingerprint is stable across rebuilds — clients will never see a `REMOTE HOST IDENTIFICATION HAS CHANGED` warning after a rebuild.
 
-A bind mount was not used for this because individual file bind mounts from the WSL2
-home directory are unreliable with docker-in-docker — the overlayfs layers shadow
-them. The workspace directory is always mounted reliably, so staging via the workspace
-is used instead.
-
-**Persistent SSH host keys** (named Docker volume)
-
-The container's SSH host keys are stored in a named Docker volume
-(`monorepo-starter-ssh-host-keys`) mounted at `/etc/ssh-host-keys/`. Named volumes are
-tied to the Docker daemon, not the container image, so they survive `Rebuild Container`.
-This means the host key fingerprint accepted on first connection is permanent — you
-will never see a "REMOTE HOST IDENTIFICATION HAS CHANGED" warning after a rebuild.
-
-To intentionally rotate the host key (e.g. after a security event):
+To intentionally rotate the host keys (e.g. after a security incident):
 
 ```bash
-# On Windows / WSL2
 docker volume rm monorepo-starter-ssh-host-keys
-# Then rebuild the container, and clear the stale Windows known_hosts entry:
+```
+
+Then rebuild the container. If you have a `known_hosts` entry for the old key, remove it:
+
+```bash
 ssh-keygen -R "[127.0.0.1]:2222"
 ```
 
-**sshd lifecycle**
+### sshd lifecycle
 
-- `postCreate.ssh.bash` — installs `openssh-server`, generates host keys, writes
-  `/etc/ssh/sshd_config.d/devcontainer.conf` (key-only auth, no passwords, no root login)
-- `postStart.bash` — starts sshd on every container start, including after Docker
-  Desktop restarts or `docker stop` / `docker start` cycles
+| Script                | Responsibility                                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `postCreate.ssh.bash` | Installs `openssh-server`, generates host keys into the named volume, writes `/etc/ssh/sshd_config.d/devcontainer.conf`   |
+| `postStart.bash`      | Starts `sshd` on every container start — including after Docker Desktop restarts or `docker stop` / `docker start` cycles |
 
-## Git Lockdown
+---
 
-`containerEnv` is configured to prevent any git operations that require credentials
-or network access from inside the container. This is intentional — Claude agents
-running in this container should not be able to push code or access external git hosts.
+## Git lockdown
 
-All pushes (HTTPS, SSH, and `git@` URLs) are redirected to a disabled no-op remote.
-SSH agent forwarding is also blocked (`SSH_AUTH_SOCK` is cleared).
+`containerEnv` in `devcontainer.json` is configured to prevent AI agents from pushing code or accessing external git remotes. See [docs/claude-code.md — Security model](../docs/claude-code.md#-security-model) for the rationale.
+
+Concretely:
+
+- **All git pushes are disabled** — `pushInsteadOf` rewrites redirect every remote URL scheme (`https://`, `ssh://`, `git@`) to a no-op disabled scheme
+- **SSH agent forwarding is blocked** — `SSH_AUTH_SOCK` is cleared so forwarded keys can't be used
+- **Credential helpers are stripped** — no stored credentials can leak into the container
+
+Git reads (fetch, clone, log, diff) are unaffected — agents can read history freely.
