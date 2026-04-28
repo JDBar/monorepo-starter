@@ -7,6 +7,7 @@ This repo is pre-configured for a native [Claude Code](https://claude.ai/code) e
 - [Security model](#-security-model)
 - [GitHub access via `gh` CLI](#-github-access-via-gh-cli)
 - [Persistent memory and plans](#-persistent-memory-and-plans)
+- [Visual debugging with Playwright](#-visual-debugging-with-playwright)
 - [Connecting Claude Code Desktop via SSH](#-connecting-claude-code-desktop-via-ssh)
   - [Mac / Linux](#mac--linux)
   - [Windows](#windows)
@@ -62,6 +63,26 @@ Claude automatically maintains context across sessions using two git-tracked dir
 | `.claude/plans/`  | Implementation plans created during complex tasks                    |
 
 Both survive container rebuilds and are version-controlled, so context is shared across teammates and persists indefinitely.
+
+---
+
+## 🎭 Visual debugging with Playwright
+
+The devcontainer comes with the [Playwright MCP](https://github.com/microsoft/playwright-mcp) server configured, giving Claude a real browser it can drive to visually inspect and debug your frontend apps.
+
+Claude can:
+
+- **Navigate** to any running dev server and take screenshots
+- **Interact** with the page — click, type, fill forms, trigger hover states
+- **Inspect** the accessibility tree and computed styles without a screenshot
+- **Debug** visually — capture a broken state, check console errors, inspect network requests
+
+This is wired up as a `/visual-debug` skill. When working on UI, just ask Claude to take a screenshot or check how something looks and it will use the browser automatically.
+
+> [!TIP]
+> The dev server needs to be running before Claude can visit it. Start it with `pnpm dev` or `pnpm --filter <app-name> dev`, then ask Claude to inspect the page.
+
+Screenshots Claude takes during a session are saved to `.claude/screenshots/` in the repo.
 
 ---
 

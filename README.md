@@ -71,7 +71,7 @@ Shared packages live in `packages/` and are consumed via the `workspace:*` proto
 
 ## 📚 Guides
 
-| Guide                              | Description                                                 |
-| ---------------------------------- | ----------------------------------------------------------- |
-| [Setup](docs/setup.md)             | Prerequisites, devcontainer setup, first-time configuration |
-| [Claude Code](docs/claude-code.md) | AI agent security model, GitHub access, SSH connection      |
+| Guide                              | Description                                                        |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| [Setup](docs/setup.md)             | Prerequisites, devcontainer setup, first-time configuration        |
+| [Claude Code](docs/claude-code.md) | AI agent security model, GitHub access, SSH connection, Playwright |
